@@ -10,9 +10,13 @@
   font-family: 'OswaldMedium';
   src: url(../fonts/Oswald-Medium.ttf);
 }
+@font-face {
+  font-family: 'AirbnbLight';
+  src: url(../fonts/AirbnbCerealLight.ttf);
+}
 
 #root {
-  font-family: 'OswaldLight';
+  font-family: 'AirbnbLight';
 }
 
 #components-layout-demo-custom-trigger .trigger {
