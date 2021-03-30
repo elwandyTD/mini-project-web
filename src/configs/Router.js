@@ -1,12 +1,14 @@
 import React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
-
-import Dashboard from "../pages/Dashboard";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import Admin from "../layouts/Admin";
 
 const Router = () => {
   return (
     <BrowserRouter>
-      <Route path="/" component={Dashboard} />
+      <Switch>
+        <Route path="/admin" render={(props) => <Admin {...props} />} />
+        <Redirect to="/admin/dashboard" />
+      </Switch>
     </BrowserRouter>
   );
 };

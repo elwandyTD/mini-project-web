@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
 import styled, { keyframes } from "styled-components";
+import {
+  useHistory,
+  useLocation,
+  useParams,
+  Route,
+  Switch,
+} from "react-router-dom";
 import { Layout, Menu, Breadcrumb, Row, Col, Avatar, Modal } from "antd";
 import {
   AppstoreOutlined,
@@ -10,6 +17,8 @@ import {
   UserOutlined,
   ExclamationCircleFilled,
 } from "@ant-design/icons";
+
+import routes from "../configs/routes";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -81,9 +90,17 @@ const Divider = ({ title, collapsed }) => (
   </p>
 );
 
-const Admin = ({ children }) => {
+const Admin = () => {
   const [time, setTime] = useState(new Date());
   const [collapsed, setCollapsed] = useState(false);
+  const [breadcrumb, newBreadcrumb] = useState({
+    section: "Home",
+    path: "Dashboard",
+  });
+
+  let history = useHistory();
+  let location = useLocation();
+  let params = useParams();
 
   const onCollapse = (collapsed) => setCollapsed(collapsed);
 
@@ -106,13 +123,47 @@ const Admin = ({ children }) => {
     });
   };
 
+  const setBreadcrumb = (link = "/admin/dashboard") => {
+    let section;
+
+    let path = link.split("/")[2];
+    path = path.charAt(0).toUpperCase() + path.slice(1);
+
+    if (path === "Dashboard") {
+      section = "Home";
+    } else if (
+      path === "Category" ||
+      path === "Product" ||
+      path === "Transaction"
+    ) {
+      section = "Content";
+    } else if (path === "Settings") {
+      section = "Utilities";
+    } else if (path === "Profile") {
+      section = "Account";
+    } else {
+      section = "Error";
+      path = "Error";
+    }
+
+    newBreadcrumb({ section, path });
+  };
+
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
+    console.log(history, "history");
+    console.log(location.pathname, "location");
+    console.log(params, "params");
+    setBreadcrumb(location.pathname);
 
     return () => {
       clearInterval(interval);
     };
-  }, []);
+  }, [location]);
+
+  const pushTo = (path = "/") => {
+    history.push("/admin" + path);
+  };
 
   return (
     <Layout style={{ minHeight: "100vh" }}>
@@ -138,29 +189,49 @@ const Admin = ({ children }) => {
         </ProfileSection>
         <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline">
           <Divider title="Home" collapsed={collapsed} />
-          <Menu.Item key="1" icon={<DashboardOutlined />}>
+          <Menu.Item
+            onClick={() => pushTo("/dashboard")}
+            key="1"
+            icon={<DashboardOutlined />}
+          >
             Dashboard
           </Menu.Item>
           <Divider title="Content" collapsed={collapsed} />
           <SubMenu key="sub1" icon={<AppstoreOutlined />} title="Products">
-            <Menu.Item key="3">All product</Menu.Item>
-            <Menu.Item key="4">All category</Menu.Item>
+            <Menu.Item onClick={() => pushTo("/product")} key="2">
+              All product
+            </Menu.Item>
+            <Menu.Item onClick={() => pushTo("/category")} key="3">
+              All category
+            </Menu.Item>
           </SubMenu>
-          <Menu.Item key="5" icon={<FileDoneOutlined />}>
+          <Menu.Item
+            onClick={() => pushTo("/transaction")}
+            key="4"
+            icon={<FileDoneOutlined />}
+          >
             Transaction
           </Menu.Item>
           <Divider title="Utilities" collapsed={collapsed} />
-          <Menu.Item key="6" icon={<SettingOutlined />}>
+          <Menu.Item
+            onClick={() => pushTo("/settings")}
+            key="5"
+            icon={<SettingOutlined style={{ textAlign: "center" }} />}
+          >
             Settings
           </Menu.Item>
           <Divider title="Account" collapsed={collapsed} />
-          <Menu.Item key="7" icon={<UserOutlined />}>
+          <Menu.Item
+            onClick={() => pushTo("/profile")}
+            key="6"
+            icon={<UserOutlined />}
+          >
             Profile
           </Menu.Item>
           <Menu.Item
             danger={true}
             onClick={signOutModal}
-            key="8"
+            key="7"
             icon={<ImportOutlined />}
           >
             Sign Out
@@ -186,11 +257,21 @@ const Admin = ({ children }) => {
         </Header>
         <Content style={{ margin: "0 16px" }}>
           <Breadcrumb style={{ margin: "16px 0" }} separator=">">
-            <Breadcrumb.Item>Home</Breadcrumb.Item>
-            <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
+            <Breadcrumb.Item>{breadcrumb.section}</Breadcrumb.Item>
+            <Breadcrumb.Item>{breadcrumb.path}</Breadcrumb.Item>
           </Breadcrumb>
 
-          {children}
+          <Switch>
+            {routes.map((route, key) => {
+              return (
+                <Route
+                  path={route.layout + route.path}
+                  component={route.component}
+                  key={key}
+                />
+              );
+            })}
+          </Switch>
         </Content>
         <Footer style={{ textAlign: "center" }}>
           Market Mini @2021 by Elwandy T.D.
