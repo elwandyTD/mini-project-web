@@ -14,6 +14,10 @@
   font-family: 'AirbnbLight';
   src: url(../fonts/AirbnbCerealLight.ttf);
 }
+@font-face {
+  font-family: 'AirbnbBlack';
+  src: url(../fonts/AirbnbCerealBlack.ttf);
+}
 
 #root {
   font-family: 'AirbnbLight';
@@ -51,4 +55,8 @@
 
 .style__centered {
   text-align: center;
+}
+
+.style__card {
+  max-width: 800px;
 }
